@@ -50,7 +50,7 @@ Q_SIGNALS:
 	void responseRobotArmStateChanged(quint8 motorStates, quint8 baseMotorState, quint8 searchLEDState);
 
 private:
-	CArmEdgeInterProcessSignalPropagator(InterProcessSignalPropogatorType type, QObject *parent=0, const QString &hostName = QString("10.195.247.40"), quint16 port = 8080);
+	CArmEdgeInterProcessSignalPropagator(InterProcessSignalPropogatorType type, QObject *parent=0, const QString &hostName = QString("10.195.249.186"), quint16 port = 8080);
 	static CArmEdgeInterProcessSignalPropagator *mp_SingleInstance;
 };
 

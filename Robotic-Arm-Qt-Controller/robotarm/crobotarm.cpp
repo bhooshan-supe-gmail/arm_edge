@@ -66,7 +66,7 @@ bool CRobotArm::onRequestRobotArmStateChange(quint8 motorStates, quint8 baseMoto
 	RobotArmState robotArmState;
 	robotArmState.m_MotorStates.m_MotorM1M2M3M4_uin8 = motorStates;
 	robotArmState.m_BaseMotorState.m_BaseMotor_uin8 = baseMotorState;
-	robotArmState.m_SearchLEDState.m_SearchLED_uin8 = baseMotorState;
+	robotArmState.m_SearchLEDState.m_SearchLED_uin8 = searchLEDState;
 
 	qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__;
 	qDebug() << ":robotArmState.m_MotorStates=" << robotArmState.m_MotorStates.m_MotorM1M2M3M4_uin8;
@@ -89,7 +89,7 @@ bool CRobotArm::onResponseRobotArmStateChanged(quint8 motorStates, quint8 baseMo
 	RobotArmState robotArmState;
 	robotArmState.m_MotorStates.m_MotorM1M2M3M4_uin8 = motorStates;
 	robotArmState.m_BaseMotorState.m_BaseMotor_uin8 = baseMotorState;
-	robotArmState.m_SearchLEDState.m_SearchLED_uin8 = baseMotorState;
+	robotArmState.m_SearchLEDState.m_SearchLED_uin8 = searchLEDState;
 
 	qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__;
 	qDebug() << ":robotArmState.m_MotorStates=" << robotArmState.m_MotorStates.m_MotorM1M2M3M4_uin8;
