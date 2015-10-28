@@ -5,39 +5,44 @@
 #include <QObject>
 
 #include "robotarmstate.h"
+#include "ArmEdgeInterProcessSignalPropagator.h"
 
 class CRobotArm : public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    ~CRobotArm();
+	~CRobotArm();
 
-    static CRobotArm* instance();
+	static CRobotArm* instance();
 
-    bool initialize();
-    bool deinitialize();
-    bool setRobotArmSate(RobotArmState robotArmSate);
-    RobotArmState getRobotArmCurrentSate();
+	bool initialize();
+	bool deinitialize();
+	RobotArmState getRobotArmCurrentSate();
 
 signals:
+	void requestRobotArmStateChange(quint8 motorStates, quint8 baseMotorState, quint8 searchLEDState);
+	void responseRobotArmStateChanged(quint8 motorStates, quint8 baseMotorState, quint8 searchLEDState);
 
 public slots:
+	bool onRequestRobotArmStateChange(quint8 motorStates, quint8 baseMotorState, quint8 searchLEDState);
+	bool onResponseRobotArmStateChanged(quint8 motorStates, quint8 baseMotorState, quint8 searchLEDState);
 
 public:
-    static const RobotArmState RobotArmResetState;
+	static const RobotArmState RobotArmResetState;
 
 protected:
-    RobotArmState m_CurrentRobotArmState;
+	RobotArmState m_CurrentRobotArmState;
 
 private:
-    CRobotArm(QObject *parent = 0);
+	CRobotArm(QObject *parent = 0);
 
 private:
-    static CRobotArm *mp_SingleInstance;
-    static struct libusb_device_handle *devh;
-    static libusb_device **devs;
+	CArmEdgeInterProcessSignalPropagator *m_pArmEdgeInterProcessSignalPropagator;
 
+	static CRobotArm *mp_SingleInstance;
+	static struct libusb_device_handle *devh;
+	static libusb_device **devs;
 };
 
 #endif // CROBOTARM_H

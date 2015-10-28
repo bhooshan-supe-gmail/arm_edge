@@ -29,14 +29,41 @@
  *   your version.                                                         *
  ***************************************************************************/
 
+#include <QCoreApplication>
+
 #include "ArmEdgeInterProcessSignalPropagator.h"
+
+CArmEdgeInterProcessSignalPropagator *CArmEdgeInterProcessSignalPropagator::mp_SingleInstance = NULL;
 
 CArmEdgeInterProcessSignalPropagator::CArmEdgeInterProcessSignalPropagator(InterProcessSignalPropogatorType type, QObject *parent, const QString &hostName, quint16 port)
         :QInterProcessSignalPropogator(type, parent, hostName, port)
 {
+	qRegisterMetaType<RobotArmState>("RobotArmState");
 }
 
 CArmEdgeInterProcessSignalPropagator::~CArmEdgeInterProcessSignalPropagator()
 {
 }
 
+CArmEdgeInterProcessSignalPropagator* CArmEdgeInterProcessSignalPropagator::instance(InterProcessSignalPropogatorType type)
+{
+	CArmEdgeInterProcessSignalPropagator *p_ReturnValue = NULL;
+	if (mp_SingleInstance == NULL) {
+		if(QCoreApplication::arguments().size() >= 3)
+		{
+			mp_SingleInstance = new CArmEdgeInterProcessSignalPropagator(type, QCoreApplication::instance(), QCoreApplication::arguments().at(1), QCoreApplication::arguments().at(2).toInt());
+		}
+		else
+		{
+			mp_SingleInstance = new CArmEdgeInterProcessSignalPropagator(type, QCoreApplication::instance());
+		}
+	}
+
+	if (mp_SingleInstance != NULL) {
+		if (mp_SingleInstance->getInterProcessSignalPropogatorType() == type) {
+			p_ReturnValue = mp_SingleInstance;
+		}
+	}
+
+	return p_ReturnValue;
+}

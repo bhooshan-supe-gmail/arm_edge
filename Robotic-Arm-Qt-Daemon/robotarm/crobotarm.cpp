@@ -39,13 +39,29 @@ libusb_device * find_arm(libusb_device **devs)
 
 
 CRobotArm::CRobotArm(QObject *parent) :
-    QObject(parent)
+	QObject(parent),
+	m_pArmEdgeInterProcessSignalPropagator(NULL)
 {
     qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__;
     qDebug() << ":sizeof(CRobotArm::RobotArmResetState)=" << sizeof(CRobotArm::RobotArmResetState);
 
     bool bIsArmInited = initialize();
     qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__ << ":bIsArmInited=" << bIsArmInited;
+
+	bool isConnected = false;
+	qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__ << ":isConnected=" << isConnected;
+
+	m_pArmEdgeInterProcessSignalPropagator = CArmEdgeInterProcessSignalPropagator::instance(QInterProcessSignalPropogator::InterProcessSignalPropogatorServer);
+	qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__ << ":m_pArmEdgeInterProcessSignalPropagator=" << m_pArmEdgeInterProcessSignalPropagator;
+
+	if(m_pArmEdgeInterProcessSignalPropagator != NULL)
+	{
+		isConnected = connect(m_pArmEdgeInterProcessSignalPropagator, SIGNAL(requestRobotArmStateChange(quint8, quint8, quint8)), this, SLOT(onRequestRobotArmStateChange(quint8, quint8, quint8)), Qt::QueuedConnection);
+		qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__ << ":isConnected=" << isConnected;
+
+		isConnected = connect(this, SIGNAL(responseRobotArmStateChanged(quint8, quint8, quint8)), m_pArmEdgeInterProcessSignalPropagator, SIGNAL(responseRobotArmStateChanged(quint8, quint8, quint8)), Qt::QueuedConnection);
+		qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__ << ":isConnected=" << isConnected;
+	}
 }
 
 CRobotArm::~CRobotArm()
@@ -121,16 +137,26 @@ bool CRobotArm::deinitialize()
     return return_value;
 }
 
-bool CRobotArm::setRobotArmSate(RobotArmState robotArmSate)
+bool CRobotArm::onRequestRobotArmStateChange(quint8 motorStates, quint8 baseMotorState, quint8 searchLEDState)
 {
     bool return_value = true;
+	RobotArmState robotArmState;
+	robotArmState.m_MotorStates.m_MotorM1M2M3M4_uin8 = motorStates;
+	robotArmState.m_BaseMotorState.m_BaseMotor_uin8 = baseMotorState;
+	robotArmState.m_SearchLEDState.m_SearchLED_uin8 = searchLEDState;
+
+	qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__;
+	qDebug() << ":robotArmState.m_MotorStates=" << robotArmState.m_MotorStates.m_MotorM1M2M3M4_uin8;
+	qDebug() << ":robotArmState.m_BaseMotorState=" << robotArmState.m_BaseMotorState.m_BaseMotor_uin8;
+	qDebug() << ":robotArmState.m_SearchLEDState=" << robotArmState.m_SearchLEDState.m_SearchLED_uin8;
+
     if (devh != NULL && devs != NULL) {
         int actual_length=-1;
         int r;
         unsigned char cmd[3];
-        cmd[0]=(unsigned char)robotArmSate.m_MotorStates.m_MotorM1M2M3M4_uin8;
-        cmd[1]=(unsigned char)robotArmSate.m_BaseMotorState.m_BaseMotor_uin8;
-        cmd[2]=(unsigned char)robotArmSate.m_SearchLEDState.m_SearchLED_uin8;
+        cmd[0]=(unsigned char)robotArmState.m_MotorStates.m_MotorM1M2M3M4_uin8;
+        cmd[1]=(unsigned char)robotArmState.m_BaseMotorState.m_BaseMotor_uin8;
+        cmd[2]=(unsigned char)robotArmState.m_SearchLEDState.m_SearchLED_uin8;
 
         r = libusb_control_transfer(devh,
                                     0x40, //uint8_t 	bmRequestType,
@@ -149,13 +175,30 @@ bool CRobotArm::setRobotArmSate(RobotArmState robotArmSate)
     }
 
     if (return_value) {
-        m_CurrentRobotArmState = robotArmSate;
+		m_CurrentRobotArmState = robotArmState;
+		emit responseRobotArmStateChanged(m_CurrentRobotArmState.m_MotorStates.m_MotorM1M2M3M4_uin8, m_CurrentRobotArmState.m_BaseMotorState.m_BaseMotor_uin8, m_CurrentRobotArmState.m_SearchLEDState.m_SearchLED_uin8);
         qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__;
         qDebug() << ":m_CurrentRobotArmState.m_MotorStates=" << m_CurrentRobotArmState.m_MotorStates.m_MotorM1M2M3M4_uin8;
         qDebug() << ":m_CurrentRobotArmState.m_BaseMotorState=" << m_CurrentRobotArmState.m_BaseMotorState.m_BaseMotor_uin8;
         qDebug() << ":m_CurrentRobotArmState.m_SearchLEDState=" << m_CurrentRobotArmState.m_SearchLEDState.m_SearchLED_uin8;
     }
-    return return_value;
+	return return_value;
+}
+
+bool CRobotArm::onResponseRobotArmStateChanged(quint8 motorStates, quint8 baseMotorState, quint8 searchLEDState)
+{
+	bool return_value = true;
+	RobotArmState robotArmState;
+	robotArmState.m_MotorStates.m_MotorM1M2M3M4_uin8 = motorStates;
+	robotArmState.m_BaseMotorState.m_BaseMotor_uin8 = baseMotorState;
+	robotArmState.m_SearchLEDState.m_SearchLED_uin8 = searchLEDState;
+
+	qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__;
+	qDebug() << ":robotArmState.m_MotorStates=" << robotArmState.m_MotorStates.m_MotorM1M2M3M4_uin8;
+	qDebug() << ":robotArmState.m_BaseMotorState=" << robotArmState.m_BaseMotorState.m_BaseMotor_uin8;
+	qDebug() << ":robotArmState.m_SearchLEDState=" << robotArmState.m_SearchLEDState.m_SearchLED_uin8;
+
+	return return_value;
 }
 
 RobotArmState CRobotArm::getRobotArmCurrentSate()

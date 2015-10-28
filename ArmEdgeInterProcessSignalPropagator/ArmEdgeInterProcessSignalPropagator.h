@@ -28,6 +28,8 @@
  *   you do not wish to do so, delete this exception statement from        *
  *   your version.                                                         *
  ***************************************************************************/
+#ifndef CARMEDGEINTERPROCESSSIGNALPROPOGATOR_H
+#define CARMEDGEINTERPROCESSSIGNALPROPOGATOR_H
 
 #include <QtCore/qobject.h>
 
@@ -39,11 +41,17 @@ class CArmEdgeInterProcessSignalPropagator : public QInterProcessSignalPropogato
 	Q_OBJECT
 
 public:
-	explicit CArmEdgeInterProcessSignalPropagator(InterProcessSignalPropogatorType type, QObject *parent=0, const QString &hostName = QString("127.0.0.1"), quint16 port = 8080);
-
 	virtual ~CArmEdgeInterProcessSignalPropagator();
 
+	static CArmEdgeInterProcessSignalPropagator* instance(InterProcessSignalPropogatorType type);
+
 Q_SIGNALS:
-	void requestRobotArmStateChange(RobotArmState robotArmSate);
-	void responseRobotArmStateChanged(RobotArmState robotArmSate);
+	void requestRobotArmStateChange(quint8 motorStates, quint8 baseMotorState, quint8 searchLEDState);
+	void responseRobotArmStateChanged(quint8 motorStates, quint8 baseMotorState, quint8 searchLEDState);
+
+private:
+	CArmEdgeInterProcessSignalPropagator(InterProcessSignalPropogatorType type, QObject *parent=0, const QString &hostName = QString("10.195.247.40"), quint16 port = 8080);
+	static CArmEdgeInterProcessSignalPropagator *mp_SingleInstance;
 };
+
+#endif // CARMEDGEINTERPROCESSSIGNALPROPOGATOR_H

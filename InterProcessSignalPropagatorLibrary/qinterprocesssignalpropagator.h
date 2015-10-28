@@ -24,7 +24,7 @@ class QInterProcessSignalPropogator : public QObject
 public:
 	enum InterProcessSignalPropogatorType {
 		InterProcessSignalPropogatorServer,
-			InterProcessSignalPropogatorclient
+		InterProcessSignalPropogatorClient
 	};
 
 public:
@@ -36,6 +36,8 @@ public:
 	QTcpSocket *getInterProcessSignalPropogatorTcpSocket();
 
     virtual bool event(QEvent *pEvent);
+
+	InterProcessSignalPropogatorType getInterProcessSignalPropogatorType() { return m_type; }
 
 protected slots:
 	virtual void delayedConnectionToHostOrBindtoClients();

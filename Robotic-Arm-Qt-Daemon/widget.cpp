@@ -1,18 +1,19 @@
 #include <QDebug>
 #include <QApplication>
 
-#include "crobotarm.h"
 #include "widget.h"
 
 Widget::Widget(QWidget *parent) : QWidget(parent)
 {
-    setupUi();
+	CRobotArm::instance();
+
+	setupUi();
     qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__;
 
     bool isConnected = false;
     qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__ << ":isConnected=" << isConnected;
 
-    isConnected = connect(m_M1OPLabel, SIGNAL(changeRobotArmStateTo(RobotArmState)), this, SLOT(onChangeRobotArmStateTo(RobotArmState)));
+	isConnected = connect(m_M1OPLabel, SIGNAL(changeRobotArmStateTo(RobotArmState)), this, SLOT(onChangeRobotArmStateTo(RobotArmState)));
     qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__ << ":isConnected=" << isConnected;
 
     isConnected = connect(m_M1CLLabel, SIGNAL(changeRobotArmStateTo(RobotArmState)), this, SLOT(onChangeRobotArmStateTo(RobotArmState)));
@@ -218,5 +219,10 @@ void Widget::retranslateUi()
 
 void Widget::onChangeRobotArmStateTo(RobotArmState robotArmState)
 {
-    CRobotArm::instance()->setRobotArmSate(robotArmState);
+	qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__;
+	qDebug() << ":robotArmState.m_MotorStates=" << robotArmState.m_MotorStates.m_MotorM1M2M3M4_uin8;
+	qDebug() << ":robotArmState.m_BaseMotorState=" << robotArmState.m_BaseMotorState.m_BaseMotor_uin8;
+	qDebug() << ":robotArmState.m_SearchLEDState=" << robotArmState.m_SearchLEDState.m_SearchLED_uin8;
+
+	CRobotArm::instance()->onRequestRobotArmStateChange(robotArmState.m_MotorStates.m_MotorM1M2M3M4_uin8, robotArmState.m_BaseMotorState.m_BaseMotor_uin8, robotArmState.m_SearchLEDState.m_SearchLED_uin8);
 }

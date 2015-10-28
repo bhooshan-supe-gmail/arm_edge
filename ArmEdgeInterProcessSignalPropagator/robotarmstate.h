@@ -2,6 +2,7 @@
 #define ROBOTARMSTAE_H
 
 #include <qglobal.h>
+#include <QMetaType>
 
 struct RobotArmState
 {
@@ -49,4 +50,7 @@ public :
 public :
     RobotArmState();
 };
+
+Q_DECLARE_METATYPE(RobotArmState);
+
 #endif // ROBOTARMSTAE_H

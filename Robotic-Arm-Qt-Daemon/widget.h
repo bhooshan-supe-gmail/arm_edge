@@ -7,7 +7,10 @@
 #include <QPushButton>
 #include <QLabel>
 
+#include "robotarmstate.h"
+
 #include "clabel.h"
+#include "crobotarm.h"
 
 class Widget : public QWidget
 {
@@ -18,13 +21,14 @@ public:
     ~Widget();
 
 public slots:
-    void onChangeRobotArmStateTo(RobotArmState robotArmState);
+	void onChangeRobotArmStateTo(RobotArmState robotArmState);
 
-private:
+protected:
     void setupUi();
     void retranslateUi();
 
-    QVBoxLayout *verticalLayout;
+protected:
+	QVBoxLayout *verticalLayout;
     QHBoxLayout *m_MotorHorizontalLayout;
     QVBoxLayout *m_M1VerticalLayout;
     CLabel *m_M1OPLabel;

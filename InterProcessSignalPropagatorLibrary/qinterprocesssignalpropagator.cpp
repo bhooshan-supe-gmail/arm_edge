@@ -14,7 +14,7 @@
 // this class is copied from qobject_p.h to prevent us
 // from including private Qt headers.
 
-#if (QT_VERSION >= 0x050401)
+#if (QT_VERSION >= 0x050300)
 
 typedef void (*StaticMetaCallFunction)(QObject *, QMetaObject::Call, int, void **);
 
@@ -56,7 +56,7 @@ private:
     ushort method_relative_;
 };
 
-#elif ((QT_VERSION >= 0x040400) && (QT_VERSION < 0x050401))
+#elif ((QT_VERSION >= 0x040400) && (QT_VERSION < 0x050300))
 
 class QMetaCallEvent : public QEvent
 {
@@ -175,7 +175,7 @@ void QInterProcessSignalPropogator::delayedConnectionToHostOrBindtoClients()
             return;
         }
     }
-    else if(InterProcessSignalPropogatorclient == m_type)
+    else if(InterProcessSignalPropogatorClient == m_type)
     {
         m_InterProcessSignalPropogatorTcpSocket = new QTcpSocket(this);
         if(NULL != m_InterProcessSignalPropogatorTcpSocket)
@@ -210,7 +210,7 @@ void QInterProcessSignalPropogator::interProcessSignalPropogatorTcpServerAcceptC
     m_InterProcessSignalPropogatorTcpSocket = m_InterProcessSignalPropogatorTcpServer->nextPendingConnection();
     if(NULL != m_InterProcessSignalPropogatorTcpSocket)
     {
-        qDebug("%s::%d", __FILE__, __LINE__);
+		qDebug("BAS_TBR:%s::%d", __FILE__, __LINE__);
         qDebug() << m_InterProcessSignalPropogatorTcpSocket->localAddress();
         qDebug() << m_InterProcessSignalPropogatorTcpSocket->localPort();
         qDebug() << m_InterProcessSignalPropogatorTcpSocket->peerAddress();
@@ -218,7 +218,7 @@ void QInterProcessSignalPropogator::interProcessSignalPropogatorTcpServerAcceptC
         qDebug() << m_InterProcessSignalPropogatorTcpSocket->state();
         qDebug() << m_InterProcessSignalPropogatorTcpSocket->errorString();
         bool bRetvalue = connect(m_InterProcessSignalPropogatorTcpSocket, SIGNAL(readyRead()), this, SLOT(interProcessSignalPropogatorTcpSocketReadyRead()));
-        qDebug("%s::%d::bRetvalue = %d", __FILE__, __LINE__, bRetvalue);
+		qDebug("BAS_TBR:%s::%d::bRetvalue = %d", __FILE__, __LINE__, bRetvalue);
     }
 }
 
@@ -229,7 +229,7 @@ bool QInterProcessSignalPropogator::event(QEvent *pEvent)
     case QEvent::MetaCall:
     {
         QMetaCallEvent *mce = static_cast<QMetaCallEvent*>(pEvent);
-        qDebug("%s::%d", __FILE__, __LINE__);
+		qDebug("BAS_TBR:%s::%d", __FILE__, __LINE__);
 
         //SEND THE SIGNAL OVER ETHERNET
         {
@@ -238,38 +238,55 @@ bool QInterProcessSignalPropogator::event(QEvent *pEvent)
 
             QDataStream lInterProcessSignalOutDataStream(&lInterProcessSignalDataBlock, QIODevice::WriteOnly);
 
-#if (QT_VERSION >= 0x050401)
+			qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__ << ":QT_VERSION=" << QT_VERSION;
+
+#if (QT_VERSION >= 0x050400)
             lInterProcessSignalOutDataStream.setVersion(QDataStream::Qt_5_4);
-#elif ((QT_VERSION >= 0x040400) && (QT_VERSION < 0x050401))
-            lInterProcessSignalOutDataStream.setVersion(QDataStream::Qt_4_4);
+			qDebug("BAS_TBR:%s::%d", __FILE__, __LINE__);
+#elif ((QT_VERSION >= 0x050300) && (QT_VERSION < 0x050400))
+			lInterProcessSignalOutDataStream.setVersion(QDataStream::Qt_5_3);
+			qDebug("BAS_TBR:%s::%d", __FILE__, __LINE__);
+#elif ((QT_VERSION >= 0x040400) && (QT_VERSION < 0x050300))
+			lInterProcessSignalOutDataStream.setVersion(QDataStream::Qt_4_4);
+			qDebug("BAS_TBR:%s::%d", __FILE__, __LINE__);
 #elif ((QT_VERSION >= 0x040303) && (QT_VERSION < 0x040400))
             lInterProcessSignalOutDataStream.setVersion(QDataStream::Qt_4_0);
+			qDebug("BAS_TBR:%s::%d", __FILE__, __LINE__);
 #else
+			qDebug("BAS_TBR:%s::%d", __FILE__, __LINE__);
 #endif
 
             lInterProcessSignalOutDataStream << (quint16)0;
 
-#if (QT_VERSION >= 0x050401)
+#if (QT_VERSION >= 0x050300)
 
             lInterProcessSignalOutDataStream << mce->method_offset();
-            lInterProcessSignalOutDataStream << mce->method_relative();
-            lInterProcessSignalOutDataStream << mce->signalId();
-            lInterProcessSignalOutDataStream << mce->nargs();
+			qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__ << ":mce->method_offset()=" << mce->method_offset();
+			lInterProcessSignalOutDataStream << mce->method_relative();
+			qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__ << ":mce->method_relative()=" << mce->method_relative();
+			lInterProcessSignalOutDataStream << mce->signalId();
+			qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__ << ":mce->signalId()=" << mce->signalId();
+			lInterProcessSignalOutDataStream << mce->nargs();
+			qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__ << ":mce->nargs()=" << mce->nargs();
 
             for (int n = 1; n < mce->nargs(); ++n)
             {
                 lInterProcessSignalOutDataStream << mce->types()[n];
+				qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__ << ":mce->types()[" << n <<"]=" << mce->types()[n];
+				qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__ << ":mce->args()[" << n <<"]=" << mce->args()[n];
 
                 if(true == QMetaType::save(lInterProcessSignalOutDataStream, mce->types()[n], mce->args()[n]))
                 {
-                }
+					qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__;
+				}
                 else
                 {
-                    lbIsSignalDataWritten = false;
+					lbIsSignalDataWritten = false;
+					qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__;
                 }
             }
 
-#elif ((QT_VERSION >= 0x040400) && (QT_VERSION < 0x050401))
+#elif ((QT_VERSION >= 0x040400) && (QT_VERSION < 0x050300))
 
             lInterProcessSignalOutDataStream << mce->id();
             lInterProcessSignalOutDataStream << mce->signalId();
@@ -291,7 +308,7 @@ bool QInterProcessSignalPropogator::event(QEvent *pEvent)
 #elif ((QT_VERSION >= 0x040303) && (QT_VERSION < 0x040400))
 
             lInterProcessSignalOutDataStream << mce->id();
-            lInterProcessSignalOutDataStream << mce->signalIdStart();
+			lInterProcessSignalOutDataStream << mce->signalIdStart();
             lInterProcessSignalOutDataStream << mce->signalIdEnd();
             lInterProcessSignalOutDataStream << mce->nargs();
 
@@ -310,10 +327,12 @@ bool QInterProcessSignalPropogator::event(QEvent *pEvent)
 
 #else
 #endif
+			qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__ << ":lbIsSignalDataWritten=" << lbIsSignalDataWritten;
 
-            if(true == lbIsSignalDataWritten)
+			if(true == lbIsSignalDataWritten)
             {
-                if(NULL != m_InterProcessSignalPropogatorTcpSocket)
+				qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__ << ":m_InterProcessSignalPropogatorTcpSocket=" << m_InterProcessSignalPropogatorTcpSocket;
+				if(NULL != m_InterProcessSignalPropogatorTcpSocket)
                 {
                     lInterProcessSignalOutDataStream.device()->seek(0);
                     lInterProcessSignalOutDataStream << (quint16)(lInterProcessSignalDataBlock.size() - sizeof(quint16));
@@ -337,7 +356,7 @@ void QInterProcessSignalPropogator::interProcessSignalPropogatorTcpSocketReadyRe
 {
     if(NULL != m_InterProcessSignalPropogatorTcpSocket)
     {
-        qDebug("%s::%d", __FILE__, __LINE__);
+		qDebug("BAS_TBR:%s::%d", __FILE__, __LINE__);
         qDebug() << m_InterProcessSignalPropogatorTcpSocket->localAddress();
         qDebug() << m_InterProcessSignalPropogatorTcpSocket->localPort();
         qDebug() << m_InterProcessSignalPropogatorTcpSocket->peerAddress();
@@ -348,13 +367,22 @@ void QInterProcessSignalPropogator::interProcessSignalPropogatorTcpSocketReadyRe
 
         QDataStream lInterProcessSignalInDataStream(m_InterProcessSignalPropogatorTcpSocket);
 
-#if (QT_VERSION >= 0x050401)
+		qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__ << ":QT_VERSION=" << QT_VERSION;
+
+#if (QT_VERSION >= 0x050400)
         lInterProcessSignalInDataStream.setVersion(QDataStream::Qt_5_4);
-#elif ((QT_VERSION >= 0x040400) && (QT_VERSION < 0x050401))
+		qDebug("BAS_TBR:%s::%d", __FILE__, __LINE__);
+#elif ((QT_VERSION >= 0x050300) && (QT_VERSION < 0x050400))
+		lInterProcessSignalInDataStream.setVersion(QDataStream::Qt_5_3);
+		qDebug("BAS_TBR:%s::%d", __FILE__, __LINE__);
+#elif ((QT_VERSION >= 0x040400) && (QT_VERSION < 0x050300))
         lInterProcessSignalInDataStream.setVersion(QDataStream::Qt_4_4);
+		qDebug("BAS_TBR:%s::%d", __FILE__, __LINE__);
 #elif ((QT_VERSION >= 0x040303) && (QT_VERSION < 0x040400))
         lInterProcessSignalInDataStream.setVersion(QDataStream::Qt_4_0);
+		qDebug("BAS_TBR:%s::%d", __FILE__, __LINE__);
 #else
+		qDebug("BAS_TBR:%s::%d", __FILE__, __LINE__);
 #endif
 
         if (m_blockSize == 0)
@@ -378,7 +406,7 @@ void QInterProcessSignalPropogator::interProcessSignalPropogatorTcpSocketReadyRe
         {
             bool lbIsSignalDataRead = true;
 
-#if (QT_VERSION >= 0x050401)
+#if (QT_VERSION >= 0x050300)
 
             ushort offset;
             ushort relative;
@@ -386,9 +414,13 @@ void QInterProcessSignalPropogator::interProcessSignalPropogatorTcpSocketReadyRe
             int nargs;
 
             lInterProcessSignalInDataStream >> offset;
-            lInterProcessSignalInDataStream >> relative;
-            lInterProcessSignalInDataStream >> signalId;
-            lInterProcessSignalInDataStream >> nargs;
+			qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__ << ":offset=" << offset;
+			lInterProcessSignalInDataStream >> relative;
+			qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__ << ":relative=" << relative;
+			lInterProcessSignalInDataStream >> signalId;
+			qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__ << ":signalId=" << signalId;
+			lInterProcessSignalInDataStream >> nargs;
+			qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__ << ":nargs=" << nargs;
 
             int *types = (int *) ::malloc(nargs*sizeof(int));
             void **args = (void **) ::malloc(nargs*sizeof(void *));
@@ -398,18 +430,22 @@ void QInterProcessSignalPropogator::interProcessSignalPropogatorTcpSocketReadyRe
             {
                 args[n] = NULL;
                 lInterProcessSignalInDataStream >> types[n];
-                args[n] = QMetaType::create(types[n]);
+				qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__ << ":types[" << n <<"]=" << types[n];
+				args[n] = QMetaType::create(types[n]);
+				qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__ << ":args[" << n <<"]=" << args[n];
 
                 if(true == QMetaType::load(lInterProcessSignalInDataStream, types[n], args[n]))
                 {
-                }
+					qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__ << ":args[" << n <<"]=" << args[n];
+				}
                 else
                 {
                     lbIsSignalDataRead = false;
-                }
+					qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__;
+				}
             }
 
-#elif ((QT_VERSION >= 0x040400) && (QT_VERSION < 0x050401))
+#elif ((QT_VERSION >= 0x040400) && (QT_VERSION < 0x050300))
 
             int id;
             int signalId;
@@ -472,14 +508,16 @@ void QInterProcessSignalPropogator::interProcessSignalPropogatorTcpSocketReadyRe
 #else
 
 #endif
+			qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__ << ":lbIsSignalDataRead=" << lbIsSignalDataRead;
 
             if(true == lbIsSignalDataRead)
             {
                 QMetaCallEvent *mce = NULL;
 
-#if (QT_VERSION >= 0x050401)
+#if (QT_VERSION >= 0x050300)
                 mce = new QMetaCallEvent(offset, relative, NULL, this, signalId, nargs, types, args);
-#elif ((QT_VERSION >= 0x040400) && (QT_VERSION < 0x050401))
+				qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__ << ":mce=" << mce;
+#elif ((QT_VERSION >= 0x040400) && (QT_VERSION < 0x050300))
                 mce = new QMetaCallEvent(id, this, signalId, nargs, types, args);
 #elif ((QT_VERSION >= 0x040303) && (QT_VERSION < 0x040400))
                 mce = new QMetaCallEvent(id, this, idFrom, idTo, nargs, types, args);
@@ -487,12 +525,16 @@ void QInterProcessSignalPropogator::interProcessSignalPropogatorTcpSocketReadyRe
 #endif
 
 #if defined(QT_NO_EXCEPTIONS)
-                mce->placeMetaCall(this);
+				qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__;
+				mce->placeMetaCall(this);
+				qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__;
 #else
                 try {
                     if (mce) {
-                        mce->placeMetaCall(this);
-                    }
+						qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__;
+						mce->placeMetaCall(this);
+						qDebug() << "BAS_TBR:" << __PRETTY_FUNCTION__ << ":" << __LINE__;
+					}
                 } catch (...) {
                     delete mce;
                     throw;
@@ -508,7 +550,7 @@ void QInterProcessSignalPropogator::interProcessSignalPropogatorTcpSocketReadyRe
 
 void QInterProcessSignalPropogator::interProcessSignalPropogatorTcpSocketErrorHandler(QAbstractSocket::SocketError socketError)
 {
-    qDebug("%s::%d", __FILE__, __LINE__);
+	qDebug("BAS_TBR:%s::%d", __FILE__, __LINE__);
     qDebug() << m_InterProcessSignalPropogatorTcpSocket->localAddress();
     qDebug() << m_InterProcessSignalPropogatorTcpSocket->localPort();
     qDebug() << m_InterProcessSignalPropogatorTcpSocket->peerAddress();
@@ -519,7 +561,7 @@ void QInterProcessSignalPropogator::interProcessSignalPropogatorTcpSocketErrorHa
 
 void QInterProcessSignalPropogator::interProcessSignalPropogatorTcpSocketStateChangeHandler(QAbstractSocket::SocketState socketState)
 {
-    qDebug("%s::%d", __FILE__, __LINE__);
+	qDebug("BAS_TBR:%s::%d", __FILE__, __LINE__);
     qDebug() << m_InterProcessSignalPropogatorTcpSocket->localAddress();
     qDebug() << m_InterProcessSignalPropogatorTcpSocket->localPort();
     qDebug() << m_InterProcessSignalPropogatorTcpSocket->peerAddress();

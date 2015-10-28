@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -28,9 +28,21 @@ HEADERS += \
 INCLUDEPATH += \
     ./. \
     ./robotarm/ \
+    ./../InterProcessSignalPropagatorLibrary/ \
     ./../ArmEdgeInterProcessSignalPropagator/ \
 
+##BAS_TBR   	-L./../lib -lInterProcessSignalPropagator \
+##BAS_TBR   	-L./../lib -lArmEdgeInterProcessSignalPropagator \
 
 LIBS += \
-	-L./../lib -lInterProcessSignalPropagator \
-	-L./../lib -lArmEdgeInterProcessSignalPropagator \
+
+# Input
+HEADERS += ./../InterProcessSignalPropagatorLibrary/qinterprocesssignalpropagator.h
+
+SOURCES += ./../InterProcessSignalPropagatorLibrary/qinterprocesssignalpropagator.cpp
+
+HEADERS += ./../ArmEdgeInterProcessSignalPropagator/ArmEdgeInterProcessSignalPropagator.h \
+	   ./../ArmEdgeInterProcessSignalPropagator/robotarmstate.h
+
+SOURCES += ./../ArmEdgeInterProcessSignalPropagator/ArmEdgeInterProcessSignalPropagator.cpp \
+	   ./../ArmEdgeInterProcessSignalPropagator/robotarmstate.cpp

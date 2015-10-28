@@ -19,3 +19,6 @@ HEADERS += ArmEdgeInterProcessSignalPropagator.h \
 SOURCES += ArmEdgeInterProcessSignalPropagator.cpp \
 	    robotarmstate.cpp
 
+# Input
+HEADERS += ./../InterProcessSignalPropagatorLibrary/qinterprocesssignalpropagator.h
+SOURCES += ./../InterProcessSignalPropagatorLibrary/qinterprocesssignalpropagator.cpp
