@@ -26,3 +26,7 @@
 *.exe
 *.out
 *.app
+
+# Qt extra files
+*.pro.user
+

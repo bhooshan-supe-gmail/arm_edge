@@ -11,6 +11,9 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = Robotic-Arm-Qt-Controller
 TEMPLATE = app
 
+CONFIG += link_pkgconfig
+PKGCONFIG += libusb-1.0
+
 SOURCES += \
     ./main.cpp \
     ./widget.cpp \

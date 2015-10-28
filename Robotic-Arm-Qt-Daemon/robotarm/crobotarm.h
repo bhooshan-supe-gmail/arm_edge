@@ -1,5 +1,6 @@
 #ifndef CROBOTARM_H
 #define CROBOTARM_H
+#include <libusb-1.0/libusb.h>
 
 #include <QObject>
 
@@ -34,6 +35,9 @@ private:
 
 private:
     static CRobotArm *mp_SingleInstance;
+    static struct libusb_device_handle *devh;
+    static libusb_device **devs;
+
 };
 
 #endif // CROBOTARM_H
