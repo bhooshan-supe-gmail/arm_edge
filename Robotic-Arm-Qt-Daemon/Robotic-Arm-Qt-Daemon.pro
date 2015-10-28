@@ -8,7 +8,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = Robotic-Arm-Qt-Controller
+TARGET = Robotic-Arm-Qt-Daemon
 TEMPLATE = app
 
 CONFIG += link_pkgconfig
