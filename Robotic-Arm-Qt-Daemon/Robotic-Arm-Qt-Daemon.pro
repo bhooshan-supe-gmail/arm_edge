@@ -18,15 +18,19 @@ SOURCES += \
     ./main.cpp \
     ./widget.cpp \
     ./clabel.cpp \
-    ./robotarm/robotarmstate.cpp \
     robotarm/crobotarm.cpp
 
 HEADERS += \
     ./widget.h \
     ./clabel.h \
-    ./robotarm/robotarmstate.h \
     robotarm/crobotarm.h
 
 INCLUDEPATH += \
     ./. \
-    ./robotarm/
+    ./robotarm/ \
+    ./../ArmEdgeInterProcessSignalPropagator/ \
+
+
+LIBS += \
+	-L./../lib -lInterProcessSignalPropagator \
+	-L./../lib -lArmEdgeInterProcessSignalPropagator \

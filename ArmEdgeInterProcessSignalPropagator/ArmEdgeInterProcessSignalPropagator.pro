@@ -13,5 +13,9 @@ INCLUDEPATH += . \
                 ./../InterProcessSignalPropagatorLibrary
 
 # Input
-HEADERS += ArmEdgeInterProcessSignalPropagator.h
-SOURCES += ArmEdgeInterProcessSignalPropagator.cpp
+HEADERS += ArmEdgeInterProcessSignalPropagator.h \
+	    robotarmstate.h
+
+SOURCES += ArmEdgeInterProcessSignalPropagator.cpp \
+	    robotarmstate.cpp
+

@@ -32,20 +32,18 @@
 #include <QtCore/qobject.h>
 
 #include "qinterprocesssignalpropagator.h"
+#include "robotarmstate.h"
 
 class CArmEdgeInterProcessSignalPropagator : public QInterProcessSignalPropogator
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-        explicit CArmEdgeInterProcessSignalPropagator(InterProcessSignalPropogatorType type, QObject *parent=0, const QString &hostName = QString("127.0.0.1"), quint16 port = 8080);
+	explicit CArmEdgeInterProcessSignalPropagator(InterProcessSignalPropogatorType type, QObject *parent=0, const QString &hostName = QString("127.0.0.1"), quint16 port = 8080);
 
-        virtual ~CArmEdgeInterProcessSignalPropagator();
+	virtual ~CArmEdgeInterProcessSignalPropagator();
 
 Q_SIGNALS:
-        void signalAccelerate();
-        void signalDecelerate();
-        void signalTurnLeft();
-        void signalTurnRight();
-        void signalCrashed();
+	void requestRobotArmStateChange(RobotArmState robotArmSate);
+	void responseRobotArmStateChanged(RobotArmState robotArmSate);
 };
